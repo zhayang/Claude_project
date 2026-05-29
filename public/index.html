@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Points Dashboard</title>
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy2: #1a2f4a;
+    --navy3: #243650;
+    --gold: #c9a84c;
+    --gold-light: #e8c96d;
+    --green: #2ecc71;
+    --yellow: #f39c12;
+    --red: #e74c3c;
+    --text: #e8edf3;
+    --text-dim: #8a9bb0;
+    --card: #162035;
+    --card2: #1e2d45;
+    --border: #2a3f5a;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--navy); color: var(--text); min-height: 100vh; }
+
+  /* Header */
+  header { background: linear-gradient(135deg, var(--navy2), var(--navy3)); border-bottom: 1px solid var(--gold); padding: 16px 24px; display: flex; align-items: center; gap: 16px; }
+  header h1 { font-size: 1.4rem; font-weight: 700; color: var(--gold-light); letter-spacing: 0.5px; }
+  header .sub { font-size: 0.8rem; color: var(--text-dim); }
+  .logo { font-size: 2rem; }
+
+  /* Search Panel */
+  .search-panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); margin: 20px 24px; padding: 20px 24px; }
+  .search-panel h2 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); margin-bottom: 16px; }
+  .search-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+  @media (max-width: 900px) { .search-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 500px) { .search-grid { grid-template-columns: 1fr; } }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .field input, .field select {
+    background: var(--navy2); border: 1px solid var(--border); border-radius: 8px;
+    color: var(--text); padding: 10px 12px; font-size: 0.95rem; outline: none;
+    transition: border-color 0.2s;
+  }
+  .field input:focus, .field select:focus { border-color: var(--gold); }
+  .field input::placeholder { color: var(--text-dim); }
+  .btn-search {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--navy); font-weight: 700; border: none; border-radius: 8px;
+    padding: 10px 28px; font-size: 0.95rem; cursor: pointer; transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .btn-search:hover { opacity: 0.9; }
+  .btn-search:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Main layout */
+  .main { display: grid; grid-template-columns: 1fr 1fr 380px; gap: 20px; padding: 0 24px 24px; }
+  @media (max-width: 1200px) { .main { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 800px) { .main { grid-template-columns: 1fr; } }
+
+  /* Panels */
+  .panel { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+  .panel-header { background: var(--card2); border-bottom: 1px solid var(--border); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
+  .panel-header h3 { font-size: 0.9rem; font-weight: 600; color: var(--gold-light); }
+  .panel-header .count { font-size: 0.75rem; color: var(--text-dim); background: var(--navy2); padding: 2px 8px; border-radius: 12px; }
+  .panel-body { padding: 16px; max-height: 600px; overflow-y: auto; }
+  .panel-body::-webkit-scrollbar { width: 4px; }
+  .panel-body::-webkit-scrollbar-track { background: var(--navy2); }
+  .panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* Flight cards */
+  .flight-card {
+    background: var(--navy2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px; margin-bottom: 10px; cursor: pointer; transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .flight-card:hover { border-color: var(--gold); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(201,168,76,0.15); }
+  .flight-card.selected { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+  .flight-card .direct-badge {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; font-weight: 600; text-transform: uppercase;
+  }
+  .direct-badge.direct { background: rgba(46,204,113,0.2); color: var(--green); border: 1px solid var(--green); }
+  .direct-badge.connecting { background: rgba(243,156,18,0.2); color: var(--yellow); border: 1px solid var(--yellow); }
+  .fc-top { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+  .fc-date { font-size: 0.95rem; font-weight: 600; }
+  .fc-source { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .fc-miles { font-size: 1.4rem; font-weight: 700; color: var(--gold-light); }
+  .fc-unit { font-size: 0.75rem; color: var(--text-dim); }
+  .fc-meta { display: flex; gap: 16px; font-size: 0.8rem; color: var(--text-dim); margin-top: 6px; flex-wrap: wrap; }
+  .fc-meta span { display: flex; align-items: center; gap: 4px; }
+  .fc-cash { margin-top: 8px; font-size: 0.8rem; color: var(--text-dim); }
+  .fc-cash strong { color: var(--text); }
+  .airline-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
+  .airline-badge { background: var(--navy3); border: 1px solid var(--border); padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; color: var(--text); }
+
+  /* Hotel section */
+  .hotel-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+  .toggle-btn { flex: 1; padding: 7px; border-radius: 7px; border: 1px solid var(--border); background: var(--navy2); color: var(--text-dim); font-size: 0.8rem; cursor: pointer; text-align: center; transition: all 0.2s; }
+  .toggle-btn.active { background: var(--gold); color: var(--navy); border-color: var(--gold); font-weight: 700; }
+
+  .hotel-card {
+    background: var(--navy2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px; margin-bottom: 10px; transition: all 0.2s;
+  }
+  .hotel-card:hover { border-color: var(--border); box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+  .hotel-card.value-excellent { border-left: 3px solid var(--green); }
+  .hotel-card.value-good { border-left: 3px solid var(--yellow); }
+  .hotel-card.value-poor { border-left: 3px solid var(--text-dim); }
+  .hotel-card.selected { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+  .hc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+  .hc-name { font-size: 0.9rem; font-weight: 600; }
+  .hc-brand { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
+  .hc-stars { color: var(--gold); font-size: 0.75rem; }
+  .hc-price { text-align: right; }
+  .hc-price .amount { font-size: 1.2rem; font-weight: 700; color: var(--gold-light); }
+  .hc-price .period { font-size: 0.7rem; color: var(--text-dim); }
+  .hc-meta { display: flex; gap: 12px; font-size: 0.78rem; color: var(--text-dim); margin-top: 8px; }
+  .value-tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+  .value-tag.excellent { background: rgba(46,204,113,0.2); color: var(--green); }
+  .value-tag.good { background: rgba(243,156,18,0.2); color: var(--yellow); }
+  .value-tag.poor { background: rgba(142,155,176,0.2); color: var(--text-dim); }
+
+  /* Summary panel */
+  .summary-panel { grid-column: span 1; }
+  .summary-section { margin-bottom: 20px; }
+  .summary-section h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 12px; }
+  .summary-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row .label { font-size: 0.85rem; color: var(--text-dim); }
+  .summary-row .value { font-size: 0.95rem; font-weight: 600; }
+  .summary-row .value.gold { color: var(--gold-light); }
+  .summary-row .value.green { color: var(--green); }
+  .summary-row .value.red { color: var(--red); }
+
+  .strategy-box { background: var(--navy2); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-top: 12px; }
+  .strategy-box h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); margin-bottom: 8px; }
+  .strategy-rec { font-size: 1rem; font-weight: 700; color: var(--gold-light); margin-bottom: 6px; }
+  .strategy-reason { font-size: 0.82rem; color: var(--text-dim); line-height: 1.5; }
+
+  .cpp-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  .cpp-table th { text-align: left; color: var(--text-dim); font-weight: 500; padding: 6px 4px; border-bottom: 1px solid var(--border); }
+  .cpp-table td { padding: 6px 4px; border-bottom: 1px solid rgba(42,63,90,0.5); }
+  .cpp-table tr:last-child td { border-bottom: none; }
+  .cpp-bar { height: 4px; border-radius: 2px; background: var(--gold); opacity: 0.7; }
+
+  /* States */
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-dim); }
+  .empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
+  .empty-state p { font-size: 0.9rem; line-height: 1.6; }
+  .loading { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 40px; color: var(--text-dim); }
+  .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error-state { background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); border-radius: 8px; padding: 14px; color: var(--red); font-size: 0.85rem; margin-bottom: 12px; }
+
+  /* Animations */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .flight-card, .hotel-card { animation: fadeIn 0.3s ease both; }
+
+  /* Divider */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  /* Selected flight indicator */
+  .selected-flight-info { background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.3); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 0.82rem; }
+  .selected-flight-info strong { color: var(--gold-light); }
+
+  /* Responsive summary */
+  @media (max-width: 1200px) { .summary-panel { grid-column: span 2; } }
+  @media (max-width: 800px) { .summary-panel { grid-column: span 1; } }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">✈️</span>
+  <div>
+    <h1>Travel Points Dashboard</h1>
+    <div class="sub">Award flights · Hotel points · Cash comparison</div>
+  </div>
+</header>
+
+<div class="search-panel">
+  <h2>🔍 Search Itinerary</h2>
+  <div class="search-grid">
+    <div class="field">
+      <label>Origin Airport</label>
+      <input type="text" id="origin" placeholder="LAX" maxlength="4" style="text-transform:uppercase">
+    </div>
+    <div class="field">
+      <label>Destination Airport</label>
+      <input type="text" id="destination" placeholder="HKG" maxlength="4" style="text-transform:uppercase">
+    </div>
+    <div class="field">
+      <label>Outbound Date</label>
+      <input type="date" id="startDate">
+    </div>
+    <div class="field">
+      <label>Return Date</label>
+      <input type="date" id="endDate">
+    </div>
+    <div class="field">
+      <label>Cabin Class</label>
+      <select id="cabin">
+        <option value="business">Business</option>
+        <option value="economy">Economy</option>
+        <option value="first">First</option>
+        <option value="premium">Premium Economy</option>
+      </select>
+    </div>
+    <button class="btn-search" id="searchBtn" onclick="search()">Search →</button>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Outbound Flights -->
+  <div class="panel">
+    <div class="panel-header">
+      <h3>✈️ Outbound Flights</h3>
+      <span class="count" id="flightCount">—</span>
+    </div>
+    <div class="panel-body" id="flightsPanel">
+      <div class="empty-state">
+        <div class="icon">🗺️</div>
+        <p>Enter your origin, destination, and dates above to find award availability across all loyalty programs.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hotels -->
+  <div class="panel">
+    <div class="panel-header">
+      <h3>🏨 Hotel Options</h3>
+      <span class="count" id="hotelCount">—</span>
+    </div>
+    <div class="panel-body" id="hotelsPanel">
+      <div class="empty-state">
+        <div class="icon">🏙️</div>
+        <p>Hotel options will appear after you search. We'll show cash rates and points redemption values side by side.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="panel summary-panel">
+    <div class="panel-header">
+      <h3>📊 Trip Summary</h3>
+    </div>
+    <div class="panel-body" id="summaryPanel">
+      <div class="empty-state">
+        <div class="icon">💰</div>
+        <p>Select a flight and hotel to see your full trip cost breakdown and points vs cash recommendation.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// State
+const state = {
+  flights: [],
+  hotels: [],
+  selectedFlight: null,
+  selectedHotel: null,
+  hotelView: 'both',
+  cabin: 'business',
+  nights: 5,
+};
+
+const CABIN_LABEL = { business: 'Business', economy: 'Economy', first: 'First', premium: 'Premium Economy' };
+const PROGRAM_NAMES = {
+  united: 'United MileagePlus', aeroplan: 'Air Canada Aeroplan', lifemiles: 'Avianca LifeMiles',
+  ethiopian: 'Ethiopian Miles', flyingblue: 'Air France/KLM Flying Blue',
+  qantas: 'Qantas Frequent Flyer', delta: 'Delta SkyMiles', american: 'American AAdvantage',
+};
+const PROGRAM_EMOJI = {
+  united: '🇺🇸', aeroplan: '🍁', lifemiles: '🌎', ethiopian: '🌍',
+  flyingblue: '🇫🇷', qantas: '🦘', delta: '🔷', american: '🦅',
+};
+const BRAND_EMOJI = { Hyatt: '🔵', Marriott: '🔴', Hilton: '🟡', IHG: '🟢', Sonesta: '🟣' };
+
+// Set default dates (today + 60 days out, 7 day trip)
+function initDates() {
+  const d = new Date();
+  d.setDate(d.getDate() + 60);
+  document.getElementById('startDate').value = d.toISOString().split('T')[0];
+  d.setDate(d.getDate() + 7);
+  document.getElementById('endDate').value = d.toISOString().split('T')[0];
+}
+initDates();
+
+async function search() {
+  const origin = document.getElementById('origin').value.trim().toUpperCase();
+  const destination = document.getElementById('destination').value.trim().toUpperCase();
+  const start = document.getElementById('startDate').value;
+  const end = document.getElementById('endDate').value;
+  const cabin = document.getElementById('cabin').value;
+
+  if (!origin || !destination || !start || !end) {
+    alert('Please fill in all fields.');
+    return;
+  }
+  if (origin.length < 3 || destination.length < 3) {
+    alert('Please enter valid 3-letter airport codes (e.g. LAX, HKG).');
+    return;
+  }
+
+  state.cabin = cabin;
+  const startD = new Date(start);
+  const endD = new Date(end);
+  state.nights = Math.max(1, Math.round((endD - startD) / 86400000));
+
+  const btn = document.getElementById('searchBtn');
+  btn.disabled = true; btn.textContent = 'Searching…';
+
+  state.selectedFlight = null;
+  state.selectedHotel = null;
+
+  // Parallel: flights + hotels
+  await Promise.all([
+    fetchFlights(origin, destination, start, end, cabin),
+    fetchHotels(destination, start, end),
+  ]);
+
+  btn.disabled = false; btn.textContent = 'Search →';
+  renderSummary();
+}
+
+async function fetchFlights(origin, destination, start, end, cabin) {
+  const panel = document.getElementById('flightsPanel');
+  panel.innerHTML = '<div class="loading"><div class="spinner"></div> Scanning award space across all programs…</div>';
+  document.getElementById('flightCount').textContent = '…';
+
+  try {
+    const res = await fetch(`/api/flights?origin=${origin}&destination=${destination}&start=${start}&end=${end}&cabin=${cabin}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'API error');
+    state.flights = data.results || [];
+    state._flightsHasMore = data.hasMore || false;
+    renderFlights();
+  } catch (e) {
+    panel.innerHTML = `<div class="error-state">⚠️ ${e.message}</div><div class="empty-state"><div class="icon">🔌</div><p>Could not fetch flight data. Make sure the server has a valid SEAT_AERO_API_KEY.</p></div>`;
+    document.getElementById('flightCount').textContent = 'error';
+  }
+}
+
+async function fetchHotels(destination, checkin, checkout) {
+  const panel = document.getElementById('hotelsPanel');
+  panel.innerHTML = '<div class="loading"><div class="spinner"></div> Loading hotel options…</div>';
+  document.getElementById('hotelCount').textContent = '…';
+
+  try {
+    const res = await fetch(`/api/hotels?destination=${destination}&checkin=${checkin}&checkout=${checkout}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'API error');
+    state.hotels = data.hotels || [];
+    state.nights = data.nights || state.nights;
+    renderHotels();
+  } catch (e) {
+    panel.innerHTML = `<div class="error-state">⚠️ ${e.message}</div>`;
+    document.getElementById('hotelCount').textContent = 'error';
+  }
+}
+
+function renderFlights() {
+  const panel = document.getElementById('flightsPanel');
+  const flights = state.flights;
+  document.getElementById('flightCount').textContent = flights.length ? `${flights.length}${state._flightsHasMore ? '+' : ''} options` : 'none found';
+
+  if (!flights.length) {
+    panel.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">🔍</div>
+        <p>No award availability found for this route and date range across all tracked programs.</p>
+        <p style="margin-top:8px;font-size:0.8rem;">Try expanding your date range or searching a nearby date.</p>
+      </div>`;
+    return;
+  }
+
+  panel.innerHTML = flights.map((f, i) => `
+    <div class="flight-card ${state.selectedFlight === i ? 'selected' : ''}" onclick="selectFlight(${i})" style="animation-delay:${i*0.04}s">
+      <span class="direct-badge ${f.direct ? 'direct' : 'connecting'}">${f.direct ? '✓ Direct' : '~ Connecting'}</span>
+      <div class="fc-top">
+        <div class="fc-date">${formatDate(f.date)}</div>
+        <div class="fc-source">${PROGRAM_EMOJI[f.source] || '🌐'} ${PROGRAM_NAMES[f.source] || f.source}</div>
+      </div>
+      <div>
+        <span class="fc-miles">${Number(f.miles).toLocaleString()}</span>
+        <span class="fc-unit"> pts + ${f.taxes_currency} ${f.taxes.toLocaleString()} taxes</span>
+      </div>
+      <div class="fc-cash">Cash equiv: <strong>~$${f.cash_equiv.toLocaleString()}</strong> <span>(@ ${f.cpp}¢/pt)</span></div>
+      <div class="airline-badges">${(f.airlines || '').split(',').filter(Boolean).map(a => `<span class="airline-badge">${a.trim()}</span>`).join('')}</div>
+      <div class="fc-meta">
+        <span>💺 ${f.seats}+ seats</span>
+        <span>📅 ${f.date}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderHotels() {
+  const panel = document.getElementById('hotelsPanel');
+  const hotels = state.hotels;
+  document.getElementById('hotelCount').textContent = hotels.length ? `${hotels.length} properties` : 'none';
+
+  if (!hotels.length) {
+    panel.innerHTML = '<div class="empty-state"><div class="icon">🏨</div><p>No hotel data available.</p></div>';
+    return;
+  }
+
+  const toggleHtml = `
+    <div class="hotel-toggle">
+      <div class="toggle-btn ${state.hotelView === 'cash' ? 'active' : ''}" onclick="setHotelView('cash')">💵 Cash</div>
+      <div class="toggle-btn ${state.hotelView === 'both' ? 'active' : ''}" onclick="setHotelView('both')">⚖️ Both</div>
+      <div class="toggle-btn ${state.hotelView === 'points' ? 'active' : ''}" onclick="setHotelView('points')">🏆 Points</div>
+    </div>`;
+
+  const cards = hotels.map((h, i) => {
+    const cashTotal = h.total_cash;
+    const ptTotal = h.total_points;
+    const ptCashVal = h.cash_value_of_points;
+    const savings = cashTotal - ptCashVal;
+
+    let priceHtml = '';
+    if (state.hotelView === 'cash' || state.hotelView === 'both') {
+      priceHtml += `<div class="hc-price"><div class="amount">$${cashTotal.toLocaleString()}</div><div class="period">${state.nights}n cash</div></div>`;
+    }
+    if (state.hotelView === 'points' || state.hotelView === 'both') {
+      priceHtml += `<div class="hc-price" style="margin-top:${state.hotelView==='both'?'6px':'0'}">
+        <div class="amount" style="color:${h.value_rating==='excellent'?'var(--green)':h.value_rating==='good'?'var(--yellow)':'var(--text-dim)'}">${ptTotal.toLocaleString()}</div>
+        <div class="period">${state.nights}n pts</div>
+      </div>`;
+    }
+
+    return `
+    <div class="hotel-card value-${h.value_rating}${state.selectedHotel === i ? ' selected' : ''}" onclick="selectHotel(${i})" style="animation-delay:${i*0.05}s;cursor:pointer">
+      <div class="hc-top">
+        <div>
+          <div class="hc-name">${BRAND_EMOJI[h.brand] || '🏨'} ${h.name}</div>
+          <div class="hc-brand">${h.program} · ${'⭐'.repeat(h.stars)}</div>
+        </div>
+        <div style="text-align:right">${priceHtml}</div>
+      </div>
+      <div class="hc-meta">
+        <span>${h.cpp}¢/pt</span>
+        <span class="value-tag ${h.value_rating}">${h.value_rating === 'excellent' ? '🏆 Best Value' : h.value_rating === 'good' ? '✓ Good' : '≈ Fair'}</span>
+        ${savings > 0 && state.hotelView !== 'cash' ? `<span style="color:var(--green);font-size:0.75rem">Save $${savings.toLocaleString()} vs cash</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  panel.innerHTML = toggleHtml + cards;
+}
+
+function setHotelView(view) {
+  state.hotelView = view;
+  renderHotels();
+}
+
+function selectFlight(i) {
+  state.selectedFlight = i;
+  renderFlights();
+  renderSummary();
+}
+
+function selectHotel(i) {
+  state.selectedHotel = i;
+  renderHotels();
+  renderSummary();
+}
+
+function renderSummary() {
+  const panel = document.getElementById('summaryPanel');
+  const flight = state.selectedFlight !== null ? state.flights[state.selectedFlight] : null;
+  const hotel = state.selectedHotel !== null ? state.hotels[state.selectedHotel] : null;
+
+  if (!flight && !hotel) {
+    panel.innerHTML = `
+      <div class="empty-state"><div class="icon">👆</div><p>Click a flight and hotel card to build your trip summary.</p></div>
+      ${renderCppTable()}`;
+    return;
+  }
+
+  // Cash totals
+  const flightCash = flight ? flight.cash_equiv : 0;
+  const hotelCash = hotel ? hotel.total_cash : 0;
+  const totalCash = flightCash + hotelCash;
+
+  // Points totals
+  const flightMiles = flight ? flight.miles_raw : 0;
+  const flightTaxes = flight ? flight.taxes : 0;
+  const hotelPoints = hotel ? hotel.total_points : 0;
+  const flightPointsValue = flight ? flight.cash_equiv : 0;
+  const hotelPointsValue = hotel ? hotel.cash_value_of_points : 0;
+  const totalPointsValue = flightPointsValue + hotelPointsValue;
+  const totalCashOutOfPocket = flightTaxes + (hotel ? 0 : 0); // taxes still needed
+  const savings = totalCash - totalPointsValue - flightTaxes;
+
+  // Strategy recommendation
+  let strategy = 'Hybrid';
+  let reason = 'Use points for flights, cash for hotels.';
+  const hotelCpp = hotel ? hotel.cpp : 0;
+  if (hotelCpp >= 1.5 && flightMiles > 0) {
+    strategy = '🏆 All Points';
+    reason = `Both your flight (${flight?.source}) and hotel (${hotel?.program}) offer excellent points value. Maximize redemptions!`;
+  } else if (hotelCpp < 0.7 && flightMiles > 0) {
+    strategy = '✈️ Points for Flights';
+    reason = `Pay cash for the hotel ($${hotelCash.toLocaleString()}) and use miles for the flight. Hotel points aren't worth burning here.`;
+  } else if (!flightMiles) {
+    strategy = '💵 Cash Only';
+    reason = 'No award seats available on this route. Book the cash fare.';
+  } else {
+    strategy = '⚖️ Hybrid';
+    reason = `Use miles for the flight and evaluate the hotel. At ${hotelCpp}¢/pt, hotel points are ${hotelCpp >= 1.0 ? 'decent' : 'below average'}.`;
+  }
+
+  panel.innerHTML = `
+    <div class="summary-section">
+      <h4>Flight Selection</h4>
+      ${flight ? `
+        <div class="selected-flight-info">
+          <strong>${formatDate(flight.date)}</strong> · ${PROGRAM_NAMES[flight.source] || flight.source}<br>
+          ${Number(flight.miles).toLocaleString()} miles + ${flight.taxes_currency} ${flight.taxes.toLocaleString()} taxes
+        </div>
+      ` : '<div style="color:var(--text-dim);font-size:0.85rem;margin-bottom:8px">No flight selected</div>'}
+    </div>
+
+    <div class="summary-section">
+      <h4>Hotel Selection</h4>
+      ${hotel ? `
+        <div class="selected-flight-info">
+          <strong>${hotel.name}</strong><br>
+          ${state.nights} nights · $${hotel.total_cash.toLocaleString()} cash or ${hotel.total_points.toLocaleString()} pts
+        </div>
+      ` : '<div style="color:var(--text-dim);font-size:0.85rem;margin-bottom:8px">No hotel selected</div>'}
+    </div>
+
+    <hr class="divider">
+
+    <div class="summary-section">
+      <h4>💵 Cash Scenario</h4>
+      <div class="summary-row"><span class="label">Flight (cash equiv)</span><span class="value">$${flightCash.toLocaleString()}</span></div>
+      <div class="summary-row"><span class="label">Hotel (${state.nights} nights)</span><span class="value">$${hotelCash.toLocaleString()}</span></div>
+      <div class="summary-row"><span class="label">Total Cash</span><span class="value gold">$${totalCash.toLocaleString()}</span></div>
+    </div>
+
+    <div class="summary-section">
+      <h4>🏆 Points Scenario</h4>
+      <div class="summary-row"><span class="label">Flight miles</span><span class="value">${flightMiles.toLocaleString()} pts</span></div>
+      <div class="summary-row"><span class="label">Hotel points</span><span class="value">${hotelPoints.toLocaleString()} pts</span></div>
+      <div class="summary-row"><span class="label">Cash out-of-pocket (taxes)</span><span class="value">$${flightTaxes.toLocaleString()}</span></div>
+      <div class="summary-row"><span class="label">Points value</span><span class="value gold">~$${totalPointsValue.toLocaleString()}</span></div>
+      <div class="summary-row"><span class="label">Savings vs cash</span><span class="value ${savings > 0 ? 'green' : 'red'}">${savings > 0 ? '+' : ''}$${savings.toLocaleString()}</span></div>
+    </div>
+
+    <div class="strategy-box">
+      <h4>💡 Recommendation</h4>
+      <div class="strategy-rec">${strategy}</div>
+      <div class="strategy-reason">${reason}</div>
+    </div>
+
+    <hr class="divider">
+    ${renderCppTable()}
+  `;
+}
+
+function renderCppTable() {
+  const programs = [
+    ['World of Hyatt', 1.5], ['Aeroplan', 1.5], ['United MileagePlus', 1.5],
+    ['Qantas FF', 1.4], ['American AAdvantage', 1.4], ['Flying Blue', 1.3],
+    ['LifeMiles', 1.3], ['Delta SkyMiles', 1.2], ['IHG One Rewards', 0.6],
+    ['Hilton Honors', 0.5], ['Marriott Bonvoy', 0.8],
+  ];
+  return `
+    <div class="summary-section">
+      <h4>📈 Points Valuations (¢/pt)</h4>
+      <table class="cpp-table">
+        <thead><tr><th>Program</th><th>CPP</th><th></th></tr></thead>
+        <tbody>${programs.map(([name, cpp]) => `
+          <tr>
+            <td>${name}</td>
+            <td>${cpp}¢</td>
+            <td><div class="cpp-bar" style="width:${Math.round(cpp / 1.5 * 80)}px"></div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+</script>
+</body>
+</html>
