@@ -54,6 +54,19 @@
   .btn-search:hover { opacity: 0.9; }
   .btn-search:disabled { opacity: 0.5; cursor: not-allowed; }
 
+  /* Filter bar */
+  .filter-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 10px 16px; background: var(--navy); border-bottom: 1px solid var(--border); }
+  .filter-bar label { font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+  .filter-bar select, .filter-bar input {
+    background: var(--navy2); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); padding: 5px 10px; font-size: 0.82rem; outline: none;
+    transition: border-color 0.2s; min-width: 120px;
+  }
+  .filter-bar select:focus, .filter-bar input:focus { border-color: var(--gold); }
+  .filter-group { display: flex; align-items: center; gap: 6px; }
+  .filter-clear { background: none; border: 1px solid var(--border); border-radius: 6px; color: var(--text-dim); padding: 5px 10px; font-size: 0.78rem; cursor: pointer; transition: all 0.2s; }
+  .filter-clear:hover { border-color: var(--gold); color: var(--gold); }
+
   /* Main layout */
   .main { display: grid; grid-template-columns: 1fr 1fr 380px; gap: 20px; padding: 0 24px 24px; }
   @media (max-width: 1200px) { .main { grid-template-columns: 1fr 1fr; } }
@@ -64,7 +77,7 @@
   .panel-header { background: var(--card2); border-bottom: 1px solid var(--border); padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; }
   .panel-header h3 { font-size: 0.9rem; font-weight: 600; color: var(--gold-light); }
   .panel-header .count { font-size: 0.75rem; color: var(--text-dim); background: var(--navy2); padding: 2px 8px; border-radius: 12px; }
-  .panel-body { padding: 16px; max-height: 600px; overflow-y: auto; }
+  .panel-body { padding: 16px; max-height: 620px; overflow-y: auto; }
   .panel-body::-webkit-scrollbar { width: 4px; }
   .panel-body::-webkit-scrollbar-track { background: var(--navy2); }
   .panel-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
@@ -83,7 +96,7 @@
   }
   .direct-badge.direct { background: rgba(46,204,113,0.2); color: var(--green); border: 1px solid var(--green); }
   .direct-badge.connecting { background: rgba(243,156,18,0.2); color: var(--yellow); border: 1px solid var(--yellow); }
-  .fc-top { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; }
+  .fc-top { display: flex; align-items: baseline; gap: 10px; margin-bottom: 8px; padding-right: 90px; }
   .fc-date { font-size: 0.95rem; font-weight: 600; }
   .fc-source { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
   .fc-miles { font-size: 1.4rem; font-weight: 700; color: var(--gold-light); }
@@ -95,10 +108,32 @@
   .airline-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 6px; }
   .airline-badge { background: var(--navy3); border: 1px solid var(--border); padding: 2px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: 600; color: var(--text); }
 
+  /* Book button */
+  .fc-actions { display: flex; justify-content: flex-end; margin-top: 10px; }
+  .btn-book {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    color: var(--navy); font-weight: 700; font-size: 0.78rem;
+    border: none; border-radius: 6px; padding: 6px 14px; cursor: pointer;
+    text-decoration: none; transition: opacity 0.2s; white-space: nowrap;
+  }
+  .btn-book:hover { opacity: 0.85; }
+  .btn-book-secondary {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: transparent; color: var(--gold);
+    font-weight: 600; font-size: 0.75rem;
+    border: 1px solid var(--gold); border-radius: 6px; padding: 5px 12px; cursor: pointer;
+    text-decoration: none; transition: all 0.2s; white-space: nowrap; margin-right: 6px;
+  }
+  .btn-book-secondary:hover { background: rgba(201,168,76,0.1); }
+
   /* Hotel section */
-  .hotel-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+  .hotel-controls { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .hotel-toggle { display: flex; gap: 6px; flex: 1; }
   .toggle-btn { flex: 1; padding: 7px; border-radius: 7px; border: 1px solid var(--border); background: var(--navy2); color: var(--text-dim); font-size: 0.8rem; cursor: pointer; text-align: center; transition: all 0.2s; }
   .toggle-btn.active { background: var(--gold); color: var(--navy); border-color: var(--gold); font-weight: 700; }
+  .chain-filter { background: var(--navy2); border: 1px solid var(--border); border-radius: 7px; color: var(--text); padding: 6px 10px; font-size: 0.8rem; outline: none; cursor: pointer; }
+  .chain-filter:focus { border-color: var(--gold); }
 
   .hotel-card {
     background: var(--navy2); border: 1px solid var(--border); border-radius: 10px;
@@ -112,15 +147,22 @@
   .hc-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
   .hc-name { font-size: 0.9rem; font-weight: 600; }
   .hc-brand { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
-  .hc-stars { color: var(--gold); font-size: 0.75rem; }
   .hc-price { text-align: right; }
   .hc-price .amount { font-size: 1.2rem; font-weight: 700; color: var(--gold-light); }
   .hc-price .period { font-size: 0.7rem; color: var(--text-dim); }
-  .hc-meta { display: flex; gap: 12px; font-size: 0.78rem; color: var(--text-dim); margin-top: 8px; }
+  .hc-meta { display: flex; gap: 12px; font-size: 0.78rem; color: var(--text-dim); margin-top: 8px; flex-wrap: wrap; }
   .value-tag { font-size: 0.7rem; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
   .value-tag.excellent { background: rgba(46,204,113,0.2); color: var(--green); }
   .value-tag.good { background: rgba(243,156,18,0.2); color: var(--yellow); }
   .value-tag.poor { background: rgba(142,155,176,0.2); color: var(--text-dim); }
+  .hc-book { display: flex; gap: 6px; margin-top: 10px; }
+  .btn-book-hotel {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: transparent; color: var(--gold); font-size: 0.75rem; font-weight: 600;
+    border: 1px solid rgba(201,168,76,0.4); border-radius: 6px; padding: 4px 10px;
+    text-decoration: none; transition: all 0.2s; cursor: pointer;
+  }
+  .btn-book-hotel:hover { background: rgba(201,168,76,0.1); border-color: var(--gold); }
 
   /* Summary panel */
   .summary-panel { grid-column: span 1; }
@@ -153,6 +195,7 @@
   .spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .error-state { background: rgba(231,76,60,0.1); border: 1px solid rgba(231,76,60,0.3); border-radius: 8px; padding: 14px; color: var(--red); font-size: 0.85rem; margin-bottom: 12px; }
+  .no-results { text-align: center; padding: 20px; color: var(--text-dim); font-size: 0.85rem; }
 
   /* Animations */
   @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -161,7 +204,7 @@
   /* Divider */
   .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
 
-  /* Selected flight indicator */
+  /* Selected info box */
   .selected-flight-info { background: rgba(201,168,76,0.08); border: 1px solid rgba(201,168,76,0.3); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 0.82rem; }
   .selected-flight-info strong { color: var(--gold-light); }
 
@@ -219,6 +262,30 @@
       <h3>✈️ Outbound Flights</h3>
       <span class="count" id="flightCount">—</span>
     </div>
+    <!-- Flight filter bar -->
+    <div class="filter-bar" id="flightFilterBar" style="display:none">
+      <div class="filter-group">
+        <label>Program</label>
+        <select id="filterProgram" onchange="applyFlightFilters()">
+          <option value="">All Programs</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Airline</label>
+        <select id="filterAirline" onchange="applyFlightFilters()">
+          <option value="">All Airlines</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Routing</label>
+        <select id="filterDirect" onchange="applyFlightFilters()">
+          <option value="">Any</option>
+          <option value="direct">Direct only</option>
+          <option value="connecting">Connecting only</option>
+        </select>
+      </div>
+      <button class="filter-clear" onclick="clearFlightFilters()">✕ Clear</button>
+    </div>
     <div class="panel-body" id="flightsPanel">
       <div class="empty-state">
         <div class="icon">🗺️</div>
@@ -256,22 +323,31 @@
 </div>
 
 <script>
-// State
+// ── State ──────────────────────────────────────────────────────────────────
 const state = {
   flights: [],
+  filteredFlights: [],
   hotels: [],
   selectedFlight: null,
   selectedHotel: null,
   hotelView: 'both',
+  chainFilter: 'all',
   cabin: 'business',
   nights: 5,
+  searchParams: {},
+  _flightsHasMore: false,
 };
 
-const CABIN_LABEL = { business: 'Business', economy: 'Economy', first: 'First', premium: 'Premium Economy' };
+// ── Constants ──────────────────────────────────────────────────────────────
 const PROGRAM_NAMES = {
-  united: 'United MileagePlus', aeroplan: 'Air Canada Aeroplan', lifemiles: 'Avianca LifeMiles',
-  ethiopian: 'Ethiopian Miles', flyingblue: 'Air France/KLM Flying Blue',
-  qantas: 'Qantas Frequent Flyer', delta: 'Delta SkyMiles', american: 'American AAdvantage',
+  united:     'United MileagePlus',
+  aeroplan:   'Air Canada Aeroplan',
+  lifemiles:  'Avianca LifeMiles',
+  ethiopian:  'Ethiopian Miles',
+  flyingblue: 'Air France/KLM Flying Blue',
+  qantas:     'Qantas Frequent Flyer',
+  delta:      'Delta SkyMiles',
+  american:   'American AAdvantage',
 };
 const PROGRAM_EMOJI = {
   united: '🇺🇸', aeroplan: '🍁', lifemiles: '🌎', ethiopian: '🌍',
@@ -279,7 +355,28 @@ const PROGRAM_EMOJI = {
 };
 const BRAND_EMOJI = { Hyatt: '🔵', Marriott: '🔴', Hilton: '🟡', IHG: '🟢', Sonesta: '🟣' };
 
-// Set default dates (today + 60 days out, 7 day trip)
+// Award booking URLs — deep-link where possible, fallback to award search page
+const BOOKING_URLS = {
+  united:     (o, d, date) => `https://www.united.com/en/us/flights/book/step-2-oneway-options?f=${o}&t=${d}&d=${date}&tt=1&at=1&cat=saver&cbm=miles&st=bestmatches`,
+  aeroplan:   (o, d, date) => `https://www.aircanada.com/aeroplan/redeem/availability/outbound?org0=${o}&dest0=${d}&departureDate0=${date}&ADT=1&YTH=0&CHD=0&INF=0&INS=0&marketCode=INT&tripType=O`,
+  lifemiles:  (o, d, date) => `https://www.lifemiles.com/mult/MilesSearch.aspx?lang=EN&ori=${o}&dest=${d}&dep=${date}&adt=1&cls=J`,
+  ethiopian:  ()            => `https://www.ethiopianairlines.com/aa/book/award-flight`,
+  flyingblue: (o, d, date) => `https://wwws.airfrance.us/search/offers?_gl=&pax=1:0:0:0:0:0:0:0&cabinClass=BUSINESS&tripType=ONE_WAY&numberOfConnections=1&travelFeatures=MILES&targetPrice=-1&originCode=${o}&destinationCode=${d}&outwardDate=${date}`,
+  qantas:     (o, d, date) => `https://www.qantas.com/en/au/flight-booking/select-flights?int-cam=au:award:search&adults=1&children=0&infants=0&cabinType=business&tripType=oneWay&classOfTravel=J&departureCity=${o}&arrivalCity=${d}&departureDate=${date}`,
+  delta:      (o, d, date) => `https://www.delta.com/flight-search/book-a-flight#/shop/ow-saver?cacheKeySuffix=&pax=1&adult=1&type=miles&fareClass=J&fromCity=${o}&toCity=${d}&departDate=${date}`,
+  american:   (o, d, date) => `https://www.aa.com/booking/find-flights?locale=en_US&pax=1&adult=1&type=oneWay&searchType=Award&cabin=B&numberOfStops=0&carriers=ALL&origin=${o}&destination=${d}&departureDate=${date}`,
+};
+
+// Hotel booking/points redemption URLs
+const HOTEL_BOOKING_URLS = {
+  'World of Hyatt':    (name) => `https://www.hyatt.com/search#/?location=${encodeURIComponent(name)}&checkinDate=&checkoutDate=&rooms=1&adults=1&kids=0&useRedemption=true`,
+  'Marriott Bonvoy':   (name) => `https://www.marriott.com/search/findHotels.mi?searchType=InCity&keywords=${encodeURIComponent(name)}&useRewards=true`,
+  'Hilton Honors':     (name) => `https://www.hilton.com/en/search/?query=${encodeURIComponent(name)}&f-price-type=POINTS`,
+  'IHG One Rewards':   (name) => `https://www.ihg.com/hotels/us/en/find-hotels/hotel/list?qDest=${encodeURIComponent(name)}&qPt=REWARD`,
+  'Sonesta Travel Pass':(name) => `https://www.sonesta.com/search?destination=${encodeURIComponent(name)}`,
+};
+
+// ── Init ───────────────────────────────────────────────────────────────────
 function initDates() {
   const d = new Date();
   d.setDate(d.getDate() + 60);
@@ -289,34 +386,28 @@ function initDates() {
 }
 initDates();
 
+// ── Search ─────────────────────────────────────────────────────────────────
 async function search() {
-  const origin = document.getElementById('origin').value.trim().toUpperCase();
+  const origin      = document.getElementById('origin').value.trim().toUpperCase();
   const destination = document.getElementById('destination').value.trim().toUpperCase();
-  const start = document.getElementById('startDate').value;
-  const end = document.getElementById('endDate').value;
-  const cabin = document.getElementById('cabin').value;
+  const start       = document.getElementById('startDate').value;
+  const end         = document.getElementById('endDate').value;
+  const cabin       = document.getElementById('cabin').value;
 
-  if (!origin || !destination || !start || !end) {
-    alert('Please fill in all fields.');
-    return;
-  }
-  if (origin.length < 3 || destination.length < 3) {
-    alert('Please enter valid 3-letter airport codes (e.g. LAX, HKG).');
-    return;
-  }
+  if (!origin || !destination || !start || !end) { alert('Please fill in all fields.'); return; }
+  if (origin.length < 3 || destination.length < 3) { alert('Please enter valid 3-letter airport codes (e.g. LAX, HKG).'); return; }
 
   state.cabin = cabin;
+  state.searchParams = { origin, destination, start, end };
   const startD = new Date(start);
-  const endD = new Date(end);
+  const endD   = new Date(end);
   state.nights = Math.max(1, Math.round((endD - startD) / 86400000));
+  state.selectedFlight = null;
+  state.selectedHotel  = null;
 
   const btn = document.getElementById('searchBtn');
   btn.disabled = true; btn.textContent = 'Searching…';
 
-  state.selectedFlight = null;
-  state.selectedHotel = null;
-
-  // Parallel: flights + hotels
   await Promise.all([
     fetchFlights(origin, destination, start, end, cabin),
     fetchHotels(destination, start, end),
@@ -326,17 +417,21 @@ async function search() {
   renderSummary();
 }
 
+// ── Flight Fetch & Filters ─────────────────────────────────────────────────
 async function fetchFlights(origin, destination, start, end, cabin) {
   const panel = document.getElementById('flightsPanel');
   panel.innerHTML = '<div class="loading"><div class="spinner"></div> Scanning award space across all programs…</div>';
   document.getElementById('flightCount').textContent = '…';
+  document.getElementById('flightFilterBar').style.display = 'none';
 
   try {
-    const res = await fetch(`/api/flights?origin=${origin}&destination=${destination}&start=${start}&end=${end}&cabin=${cabin}`);
+    const res  = await fetch(`/api/flights?origin=${origin}&destination=${destination}&start=${start}&end=${end}&cabin=${cabin}`);
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'API error');
-    state.flights = data.results || [];
-    state._flightsHasMore = data.hasMore || false;
+    state.flights         = data.results || [];
+    state._flightsHasMore = data.hasMore  || false;
+    state.filteredFlights = [...state.flights];
+    populateFlightFilterOptions();
     renderFlights();
   } catch (e) {
     panel.innerHTML = `<div class="error-state">⚠️ ${e.message}</div><div class="empty-state"><div class="icon">🔌</div><p>Could not fetch flight data. Make sure the server has a valid SEAT_AERO_API_KEY.</p></div>`;
@@ -344,41 +439,78 @@ async function fetchFlights(origin, destination, start, end, cabin) {
   }
 }
 
-async function fetchHotels(destination, checkin, checkout) {
-  const panel = document.getElementById('hotelsPanel');
-  panel.innerHTML = '<div class="loading"><div class="spinner"></div> Loading hotel options…</div>';
-  document.getElementById('hotelCount').textContent = '…';
+function populateFlightFilterOptions() {
+  const programs = [...new Set(state.flights.map(f => f.source))].sort();
+  const airlines = [...new Set(state.flights.flatMap(f => (f.airlines||'').split(',').map(a => a.trim()).filter(Boolean)))].sort();
 
-  try {
-    const res = await fetch(`/api/hotels?destination=${destination}&checkin=${checkin}&checkout=${checkout}`);
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'API error');
-    state.hotels = data.hotels || [];
-    state.nights = data.nights || state.nights;
-    renderHotels();
-  } catch (e) {
-    panel.innerHTML = `<div class="error-state">⚠️ ${e.message}</div>`;
-    document.getElementById('hotelCount').textContent = 'error';
-  }
+  const pSel = document.getElementById('filterProgram');
+  pSel.innerHTML = '<option value="">All Programs</option>' +
+    programs.map(p => `<option value="${p}">${PROGRAM_NAMES[p] || p}</option>`).join('');
+
+  const aSel = document.getElementById('filterAirline');
+  aSel.innerHTML = '<option value="">All Airlines</option>' +
+    airlines.map(a => `<option value="${a}">${a}</option>`).join('');
+
+  document.getElementById('filterDirect').value = '';
+  document.getElementById('flightFilterBar').style.display = state.flights.length ? 'flex' : 'none';
 }
 
-function renderFlights() {
-  const panel = document.getElementById('flightsPanel');
-  const flights = state.flights;
-  document.getElementById('flightCount').textContent = flights.length ? `${flights.length}${state._flightsHasMore ? '+' : ''} options` : 'none found';
+function applyFlightFilters() {
+  const prog   = document.getElementById('filterProgram').value;
+  const airline= document.getElementById('filterAirline').value;
+  const direct = document.getElementById('filterDirect').value;
 
+  state.filteredFlights = state.flights.filter(f => {
+    if (prog   && f.source !== prog) return false;
+    if (airline && !(f.airlines||'').split(',').map(a=>a.trim()).includes(airline)) return false;
+    if (direct === 'direct'     && !f.direct) return false;
+    if (direct === 'connecting' &&  f.direct) return false;
+    return true;
+  });
+
+  // Reset selected flight if it's now filtered out
+  if (state.selectedFlight !== null) {
+    const sf = state.flights[state.selectedFlight];
+    if (!state.filteredFlights.includes(sf)) { state.selectedFlight = null; renderSummary(); }
+  }
+  renderFlights();
+}
+
+function clearFlightFilters() {
+  document.getElementById('filterProgram').value = '';
+  document.getElementById('filterAirline').value = '';
+  document.getElementById('filterDirect').value  = '';
+  state.filteredFlights = [...state.flights];
+  renderFlights();
+}
+
+// ── Render Flights ─────────────────────────────────────────────────────────
+function renderFlights() {
+  const panel   = document.getElementById('flightsPanel');
+  const flights = state.filteredFlights;
+  const total   = state.flights.length;
+  const showing = flights.length;
+
+  document.getElementById('flightCount').textContent =
+    total ? `${showing}${showing < total ? ` of ${total}` : (state._flightsHasMore ? '+' : '')} options` : 'none found';
+
+  if (!total) {
+    panel.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><p>No award availability found for this route and date range.</p><p style="margin-top:8px;font-size:0.8rem;">Try expanding your date range or searching a nearby date.</p></div>`;
+    return;
+  }
   if (!flights.length) {
-    panel.innerHTML = `
-      <div class="empty-state">
-        <div class="icon">🔍</div>
-        <p>No award availability found for this route and date range across all tracked programs.</p>
-        <p style="margin-top:8px;font-size:0.8rem;">Try expanding your date range or searching a nearby date.</p>
-      </div>`;
+    panel.innerHTML = `<div class="no-results">No results match your filters. <button class="filter-clear" onclick="clearFlightFilters()" style="margin-left:6px">Clear filters</button></div>`;
     return;
   }
 
-  panel.innerHTML = flights.map((f, i) => `
-    <div class="flight-card ${state.selectedFlight === i ? 'selected' : ''}" onclick="selectFlight(${i})" style="animation-delay:${i*0.04}s">
+  const { origin, destination } = state.searchParams;
+  panel.innerHTML = flights.map((f, i) => {
+    const globalIdx = state.flights.indexOf(f);
+    const bookUrl   = BOOKING_URLS[f.source] ? BOOKING_URLS[f.source](origin, destination, f.date) : null;
+    const programUrl= getProgramSearchUrl(f.source);
+
+    return `
+    <div class="flight-card ${state.selectedFlight === globalIdx ? 'selected' : ''}" onclick="selectFlight(${globalIdx})" style="animation-delay:${i*0.04}s">
       <span class="direct-badge ${f.direct ? 'direct' : 'connecting'}">${f.direct ? '✓ Direct' : '~ Connecting'}</span>
       <div class="fc-top">
         <div class="fc-date">${formatDate(f.date)}</div>
@@ -389,37 +521,95 @@ function renderFlights() {
         <span class="fc-unit"> pts + ${f.taxes_currency} ${f.taxes.toLocaleString()} taxes</span>
       </div>
       <div class="fc-cash">Cash equiv: <strong>~$${f.cash_equiv.toLocaleString()}</strong> <span>(@ ${f.cpp}¢/pt)</span></div>
-      <div class="airline-badges">${(f.airlines || '').split(',').filter(Boolean).map(a => `<span class="airline-badge">${a.trim()}</span>`).join('')}</div>
+      <div class="airline-badges">${(f.airlines||'').split(',').filter(Boolean).map(a=>`<span class="airline-badge">${a.trim()}</span>`).join('')}</div>
       <div class="fc-meta">
         <span>💺 ${f.seats}+ seats</span>
         <span>📅 ${f.date}</span>
       </div>
-    </div>
-  `).join('');
+      <div class="fc-actions" onclick="event.stopPropagation()">
+        ${programUrl ? `<a class="btn-book-secondary" href="${programUrl}" target="_blank" rel="noopener">🔍 Search Program</a>` : ''}
+        ${bookUrl    ? `<a class="btn-book" href="${bookUrl}" target="_blank" rel="noopener">Book Now →</a>` : ''}
+      </div>
+    </div>`;
+  }).join('');
 }
 
-function renderHotels() {
+function getProgramSearchUrl(source) {
+  const urls = {
+    united:     'https://www.united.com/en/us/flight-search/book-a-flight',
+    aeroplan:   'https://www.aircanada.com/aeroplan/redeem/flights',
+    lifemiles:  'https://www.lifemiles.com/mult/MilesSearch.aspx',
+    ethiopian:  'https://www.ethiopianairlines.com/aa/book/award-flight',
+    flyingblue: 'https://wwws.airfrance.us/search/offers',
+    qantas:     'https://www.qantas.com/en/au/frequent-flyer/use-points/book-flights.html',
+    delta:      'https://www.delta.com/us/en/award-travel/overview',
+    american:   'https://www.aa.com/booking/find-flights',
+  };
+  return urls[source] || null;
+}
+
+// ── Hotel Fetch & Filters ──────────────────────────────────────────────────
+async function fetchHotels(destination, checkin, checkout) {
   const panel = document.getElementById('hotelsPanel');
+  panel.innerHTML = '<div class="loading"><div class="spinner"></div> Loading hotel options…</div>';
+  document.getElementById('hotelCount').textContent = '…';
+
+  try {
+    const res  = await fetch(`/api/hotels?destination=${destination}&checkin=${checkin}&checkout=${checkout}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'API error');
+    state.hotels = data.hotels || [];
+    state.nights = data.nights || state.nights;
+    state.chainFilter = 'all';
+    renderHotels();
+  } catch (e) {
+    panel.innerHTML = `<div class="error-state">⚠️ ${e.message}</div>`;
+    document.getElementById('hotelCount').textContent = 'error';
+  }
+}
+
+// ── Render Hotels ──────────────────────────────────────────────────────────
+function renderHotels() {
+  const panel  = document.getElementById('hotelsPanel');
   const hotels = state.hotels;
-  document.getElementById('hotelCount').textContent = hotels.length ? `${hotels.length} properties` : 'none';
 
   if (!hotels.length) {
     panel.innerHTML = '<div class="empty-state"><div class="icon">🏨</div><p>No hotel data available.</p></div>';
+    document.getElementById('hotelCount').textContent = 'none';
     return;
   }
 
-  const toggleHtml = `
-    <div class="hotel-toggle">
-      <div class="toggle-btn ${state.hotelView === 'cash' ? 'active' : ''}" onclick="setHotelView('cash')">💵 Cash</div>
-      <div class="toggle-btn ${state.hotelView === 'both' ? 'active' : ''}" onclick="setHotelView('both')">⚖️ Both</div>
-      <div class="toggle-btn ${state.hotelView === 'points' ? 'active' : ''}" onclick="setHotelView('points')">🏆 Points</div>
+  // Collect unique chains
+  const chains = [...new Set(hotels.map(h => h.brand))].sort();
+
+  const filtered = state.chainFilter === 'all'
+    ? hotels
+    : hotels.filter(h => h.brand === state.chainFilter);
+
+  document.getElementById('hotelCount').textContent =
+    `${filtered.length}${filtered.length < hotels.length ? ` of ${hotels.length}` : ''} properties`;
+
+  const chainOptions = ['all', ...chains].map(c =>
+    `<option value="${c}" ${state.chainFilter===c?'selected':''}>${c==='all'?'All Chains':c}</option>`
+  ).join('');
+
+  const controlsHtml = `
+    <div class="hotel-controls">
+      <div class="hotel-toggle">
+        <div class="toggle-btn ${state.hotelView==='cash'?'active':''}"   onclick="setHotelView('cash')">💵 Cash</div>
+        <div class="toggle-btn ${state.hotelView==='both'?'active':''}"   onclick="setHotelView('both')">⚖️ Both</div>
+        <div class="toggle-btn ${state.hotelView==='points'?'active':''}" onclick="setHotelView('points')">🏆 Points</div>
+      </div>
+      <select class="chain-filter" onchange="setChainFilter(this.value)">${chainOptions}</select>
     </div>`;
 
-  const cards = hotels.map((h, i) => {
-    const cashTotal = h.total_cash;
-    const ptTotal = h.total_points;
-    const ptCashVal = h.cash_value_of_points;
-    const savings = cashTotal - ptCashVal;
+  const cards = filtered.map((h, i) => {
+    const globalIdx  = hotels.indexOf(h);
+    const cashTotal  = h.total_cash;
+    const ptTotal    = h.total_points;
+    const ptCashVal  = h.cash_value_of_points;
+    const savings    = cashTotal - ptCashVal;
+    const bookUrl    = HOTEL_BOOKING_URLS[h.program] ? HOTEL_BOOKING_URLS[h.program](h.name) : null;
 
     let priceHtml = '';
     if (state.hotelView === 'cash' || state.hotelView === 'both') {
@@ -433,23 +623,28 @@ function renderHotels() {
     }
 
     return `
-    <div class="hotel-card value-${h.value_rating}${state.selectedHotel === i ? ' selected' : ''}" onclick="selectHotel(${i})" style="animation-delay:${i*0.05}s;cursor:pointer">
+    <div class="hotel-card value-${h.value_rating}${state.selectedHotel===globalIdx?' selected':''}" onclick="selectHotel(${globalIdx})" style="animation-delay:${i*0.05}s;cursor:pointer">
       <div class="hc-top">
         <div>
-          <div class="hc-name">${BRAND_EMOJI[h.brand] || '🏨'} ${h.name}</div>
+          <div class="hc-name">${BRAND_EMOJI[h.brand]||'🏨'} ${h.name}</div>
           <div class="hc-brand">${h.program} · ${'⭐'.repeat(h.stars)}</div>
         </div>
         <div style="text-align:right">${priceHtml}</div>
       </div>
       <div class="hc-meta">
         <span>${h.cpp}¢/pt</span>
-        <span class="value-tag ${h.value_rating}">${h.value_rating === 'excellent' ? '🏆 Best Value' : h.value_rating === 'good' ? '✓ Good' : '≈ Fair'}</span>
-        ${savings > 0 && state.hotelView !== 'cash' ? `<span style="color:var(--green);font-size:0.75rem">Save $${savings.toLocaleString()} vs cash</span>` : ''}
+        <span class="value-tag ${h.value_rating}">${h.value_rating==='excellent'?'🏆 Best Value':h.value_rating==='good'?'✓ Good':'≈ Fair'}</span>
+        ${savings>0 && state.hotelView!=='cash' ? `<span style="color:var(--green);font-size:0.75rem">Save $${savings.toLocaleString()} vs cash</span>` : ''}
       </div>
+      ${bookUrl ? `
+      <div class="hc-book" onclick="event.stopPropagation()">
+        <a class="btn-book-hotel" href="${bookUrl}" target="_blank" rel="noopener">🏨 Book with Points</a>
+        <a class="btn-book-hotel" href="${bookUrl.replace('useRedemption=true','').replace('useRewards=true','').replace('f-price-type=POINTS','').replace('qPt=REWARD','')}" target="_blank" rel="noopener">💵 Book Cash</a>
+      </div>` : ''}
     </div>`;
   }).join('');
 
-  panel.innerHTML = toggleHtml + cards;
+  panel.innerHTML = controlsHtml + (filtered.length ? cards : '<div class="no-results">No hotels match this chain filter.</div>');
 }
 
 function setHotelView(view) {
@@ -457,71 +652,79 @@ function setHotelView(view) {
   renderHotels();
 }
 
+function setChainFilter(chain) {
+  state.chainFilter = chain;
+  // Reset selected hotel if filtered out
+  if (state.selectedHotel !== null) {
+    const sh = state.hotels[state.selectedHotel];
+    if (chain !== 'all' && sh.brand !== chain) { state.selectedHotel = null; renderSummary(); }
+  }
+  renderHotels();
+}
+
+// ── Selection ──────────────────────────────────────────────────────────────
 function selectFlight(i) {
-  state.selectedFlight = i;
+  state.selectedFlight = state.selectedFlight === i ? null : i;
   renderFlights();
   renderSummary();
 }
 
 function selectHotel(i) {
-  state.selectedHotel = i;
+  state.selectedHotel = state.selectedHotel === i ? null : i;
   renderHotels();
   renderSummary();
 }
 
+// ── Summary ────────────────────────────────────────────────────────────────
 function renderSummary() {
-  const panel = document.getElementById('summaryPanel');
+  const panel  = document.getElementById('summaryPanel');
   const flight = state.selectedFlight !== null ? state.flights[state.selectedFlight] : null;
-  const hotel = state.selectedHotel !== null ? state.hotels[state.selectedHotel] : null;
+  const hotel  = state.selectedHotel  !== null ? state.hotels[state.selectedHotel]  : null;
 
   if (!flight && !hotel) {
-    panel.innerHTML = `
-      <div class="empty-state"><div class="icon">👆</div><p>Click a flight and hotel card to build your trip summary.</p></div>
-      ${renderCppTable()}`;
+    panel.innerHTML = `<div class="empty-state"><div class="icon">👆</div><p>Click a flight and hotel card to build your trip summary.</p></div>${renderCppTable()}`;
     return;
   }
 
-  // Cash totals
-  const flightCash = flight ? flight.cash_equiv : 0;
-  const hotelCash = hotel ? hotel.total_cash : 0;
-  const totalCash = flightCash + hotelCash;
+  const { origin, destination } = state.searchParams;
+  const flightCash        = flight ? flight.cash_equiv : 0;
+  const hotelCash         = hotel  ? hotel.total_cash  : 0;
+  const totalCash         = flightCash + hotelCash;
+  const flightMiles       = flight ? flight.miles_raw  : 0;
+  const flightTaxes       = flight ? flight.taxes      : 0;
+  const hotelPoints       = hotel  ? hotel.total_points : 0;
+  const totalPointsValue  = (flight ? flight.cash_equiv : 0) + (hotel ? hotel.cash_value_of_points : 0);
+  const savings           = totalCash - totalPointsValue - flightTaxes;
+  const hotelCpp          = hotel ? hotel.cpp : 0;
 
-  // Points totals
-  const flightMiles = flight ? flight.miles_raw : 0;
-  const flightTaxes = flight ? flight.taxes : 0;
-  const hotelPoints = hotel ? hotel.total_points : 0;
-  const flightPointsValue = flight ? flight.cash_equiv : 0;
-  const hotelPointsValue = hotel ? hotel.cash_value_of_points : 0;
-  const totalPointsValue = flightPointsValue + hotelPointsValue;
-  const totalCashOutOfPocket = flightTaxes + (hotel ? 0 : 0); // taxes still needed
-  const savings = totalCash - totalPointsValue - flightTaxes;
-
-  // Strategy recommendation
-  let strategy = 'Hybrid';
-  let reason = 'Use points for flights, cash for hotels.';
-  const hotelCpp = hotel ? hotel.cpp : 0;
+  let strategy, reason;
   if (hotelCpp >= 1.5 && flightMiles > 0) {
     strategy = '🏆 All Points';
-    reason = `Both your flight (${flight?.source}) and hotel (${hotel?.program}) offer excellent points value. Maximize redemptions!`;
+    reason = `Both flight (${PROGRAM_NAMES[flight.source]||flight.source}) and hotel (${hotel.program}) offer excellent value. Maximize all redemptions!`;
   } else if (hotelCpp < 0.7 && flightMiles > 0) {
-    strategy = '✈️ Points for Flights';
-    reason = `Pay cash for the hotel ($${hotelCash.toLocaleString()}) and use miles for the flight. Hotel points aren't worth burning here.`;
+    strategy = '✈️ Points for Flights Only';
+    reason = `Pay cash for the hotel ($${hotelCash.toLocaleString()}) and burn miles for the flight. Hotel points aren't worth it here.`;
   } else if (!flightMiles) {
     strategy = '💵 Cash Only';
-    reason = 'No award seats available on this route. Book the cash fare.';
+    reason = 'No award seats found. Book cash fare.';
   } else {
     strategy = '⚖️ Hybrid';
-    reason = `Use miles for the flight and evaluate the hotel. At ${hotelCpp}¢/pt, hotel points are ${hotelCpp >= 1.0 ? 'decent' : 'below average'}.`;
+    reason = `Use miles for the flight. Hotel points at ${hotelCpp}¢/pt are ${hotelCpp>=1.0?'decent':'below average'} — consider cash for hotels.`;
   }
+
+  const bookUrl = flight && BOOKING_URLS[flight.source]
+    ? BOOKING_URLS[flight.source](origin, destination, flight.date) : null;
 
   panel.innerHTML = `
     <div class="summary-section">
       <h4>Flight Selection</h4>
       ${flight ? `
         <div class="selected-flight-info">
-          <strong>${formatDate(flight.date)}</strong> · ${PROGRAM_NAMES[flight.source] || flight.source}<br>
-          ${Number(flight.miles).toLocaleString()} miles + ${flight.taxes_currency} ${flight.taxes.toLocaleString()} taxes
+          <strong>${formatDate(flight.date)}</strong> · ${PROGRAM_NAMES[flight.source]||flight.source}<br>
+          ${Number(flight.miles).toLocaleString()} miles + ${flight.taxes_currency} ${flight.taxes.toLocaleString()} taxes<br>
+          ${flight.direct ? '✅ Direct' : '🔀 Connecting'} · ${(flight.airlines||'').split(',').map(a=>`<strong>${a.trim()}</strong>`).join(', ')}
         </div>
+        ${bookUrl ? `<div style="margin-top:8px"><a class="btn-book" href="${bookUrl}" target="_blank" rel="noopener" style="width:100%;justify-content:center;display:flex">Book ${PROGRAM_NAMES[flight.source]||flight.source} →</a></div>` : ''}
       ` : '<div style="color:var(--text-dim);font-size:0.85rem;margin-bottom:8px">No flight selected</div>'}
     </div>
 
@@ -530,7 +733,7 @@ function renderSummary() {
       ${hotel ? `
         <div class="selected-flight-info">
           <strong>${hotel.name}</strong><br>
-          ${state.nights} nights · $${hotel.total_cash.toLocaleString()} cash or ${hotel.total_points.toLocaleString()} pts
+          ${state.nights} nights · $${hotel.total_cash.toLocaleString()} cash or ${hotel.total_points.toLocaleString()} pts (${hotel.program})
         </div>
       ` : '<div style="color:var(--text-dim);font-size:0.85rem;margin-bottom:8px">No hotel selected</div>'}
     </div>
@@ -538,19 +741,19 @@ function renderSummary() {
     <hr class="divider">
 
     <div class="summary-section">
-      <h4>💵 Cash Scenario</h4>
+      <h4>💵 Full Cash Cost</h4>
       <div class="summary-row"><span class="label">Flight (cash equiv)</span><span class="value">$${flightCash.toLocaleString()}</span></div>
       <div class="summary-row"><span class="label">Hotel (${state.nights} nights)</span><span class="value">$${hotelCash.toLocaleString()}</span></div>
-      <div class="summary-row"><span class="label">Total Cash</span><span class="value gold">$${totalCash.toLocaleString()}</span></div>
+      <div class="summary-row"><span class="label">Total</span><span class="value gold">$${totalCash.toLocaleString()}</span></div>
     </div>
 
     <div class="summary-section">
-      <h4>🏆 Points Scenario</h4>
-      <div class="summary-row"><span class="label">Flight miles</span><span class="value">${flightMiles.toLocaleString()} pts</span></div>
-      <div class="summary-row"><span class="label">Hotel points</span><span class="value">${hotelPoints.toLocaleString()} pts</span></div>
+      <h4>🏆 Points Redemption</h4>
+      <div class="summary-row"><span class="label">Flight miles needed</span><span class="value">${flightMiles.toLocaleString()}</span></div>
+      <div class="summary-row"><span class="label">Hotel points needed</span><span class="value">${hotelPoints.toLocaleString()}</span></div>
       <div class="summary-row"><span class="label">Cash out-of-pocket (taxes)</span><span class="value">$${flightTaxes.toLocaleString()}</span></div>
-      <div class="summary-row"><span class="label">Points value</span><span class="value gold">~$${totalPointsValue.toLocaleString()}</span></div>
-      <div class="summary-row"><span class="label">Savings vs cash</span><span class="value ${savings > 0 ? 'green' : 'red'}">${savings > 0 ? '+' : ''}$${savings.toLocaleString()}</span></div>
+      <div class="summary-row"><span class="label">Total points value</span><span class="value gold">~$${totalPointsValue.toLocaleString()}</span></div>
+      <div class="summary-row"><span class="label">Savings vs all-cash</span><span class="value ${savings>0?'green':'red'}">${savings>0?'+':''}$${savings.toLocaleString()}</span></div>
     </div>
 
     <div class="strategy-box">
@@ -560,16 +763,15 @@ function renderSummary() {
     </div>
 
     <hr class="divider">
-    ${renderCppTable()}
-  `;
+    ${renderCppTable()}`;
 }
 
 function renderCppTable() {
   const programs = [
     ['World of Hyatt', 1.5], ['Aeroplan', 1.5], ['United MileagePlus', 1.5],
     ['Qantas FF', 1.4], ['American AAdvantage', 1.4], ['Flying Blue', 1.3],
-    ['LifeMiles', 1.3], ['Delta SkyMiles', 1.2], ['IHG One Rewards', 0.6],
-    ['Hilton Honors', 0.5], ['Marriott Bonvoy', 0.8],
+    ['LifeMiles', 1.3], ['Delta SkyMiles', 1.2], ['Marriott Bonvoy', 0.8],
+    ['IHG One Rewards', 0.6], ['Hilton Honors', 0.5],
   ];
   return `
     <div class="summary-section">
@@ -580,17 +782,17 @@ function renderCppTable() {
           <tr>
             <td>${name}</td>
             <td>${cpp}¢</td>
-            <td><div class="cpp-bar" style="width:${Math.round(cpp / 1.5 * 80)}px"></div></td>
+            <td><div class="cpp-bar" style="width:${Math.round(cpp/1.5*80)}px"></div></td>
           </tr>`).join('')}
         </tbody>
       </table>
     </div>`;
 }
 
+// ── Utils ──────────────────────────────────────────────────────────────────
 function formatDate(dateStr) {
   if (!dateStr) return '—';
-  const d = new Date(dateStr + 'T00:00:00');
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 </script>
 </body>
