@@ -3,6 +3,7 @@ const fetch = require('node-fetch');
 const path = require('path');
 
 const app = express();
+app.use(express.json());
 const PORT = process.env.PORT || 3000;
 const SEATS_BASE = 'https://seats.aero/partnerapi';
 
@@ -218,6 +219,73 @@ function normalizeRow(row, prefix) {
     cash_equiv: Math.round((row[`${prefix}MileageCostRaw`] || 0) * (CPP[source] || 1.3) / 100),
   };
 }
+
+// POST /api/chat
+app.post('/api/chat', async (req, res) => {
+  const { message, history = [] } = req.body;
+  if (!message) return res.status(400).json({ error: 'message is required' });
+
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: 'ANTHROPIC_API_KEY not set on server' });
+
+  const today = new Date().toISOString().split('T')[0];
+
+  const system = `You are a helpful travel assistant embedded in a flight + hotel award search dashboard.
+Today's date is ${today}.
+
+When the user wants to search for flights or trips, respond with a JSON action block (and nothing else) in this exact format:
+<action>
+{"type":"search","origin":"LAX","destination":"HKG","start":"2026-08-01","end":"2026-08-08","cabin":"business"}
+</action>
+
+Cabin must be one of: economy, premium, business, first.
+Dates must be YYYY-MM-DD. Always pick a reasonable 7-day window if the user doesn't specify exact dates.
+Use IATA airport codes. Houston = IAH, New York (JFK) = JFK, Newark = EWR, Los Angeles = LAX, San Francisco = SFO, Chicago O'Hare = ORD, Miami = MIA, Dallas = DFW, London Heathrow = LHR, Paris = CDG, Tokyo Narita = NRT, Hong Kong = HKG, Singapore = SIN, Sydney = SYD, Dubai = DXB, Seoul = ICN, Toronto = YYZ, Vancouver = YVR.
+
+If the user is asking a general travel question (not searching), answer helpfully in 1-3 sentences. Cover topics like points strategy, airline alliances, best programs for a route, award sweet spots, etc.
+
+Do NOT wrap non-action responses in JSON. Just reply conversationally.`;
+
+  try {
+    const messages = [
+      ...history.map(m => ({ role: m.role, content: m.content })),
+      { role: 'user', content: message },
+    ];
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 512,
+        system,
+        messages,
+      }),
+    });
+
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error?.message || 'Claude API error');
+
+    const text = data.content?.[0]?.text || '';
+
+    // Parse action if present
+    const actionMatch = text.match(/<action>\s*(\{[\s\S]*?\})\s*<\/action>/);
+    if (actionMatch) {
+      try {
+        const action = JSON.parse(actionMatch[1]);
+        return res.json({ type: 'action', action, text: '' });
+      } catch { /* fall through to text */ }
+    }
+
+    res.json({ type: 'text', text });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 
